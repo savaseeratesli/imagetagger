@@ -3,7 +3,7 @@ resources:
   - name: app-repo
     type: git
     source:
-      uri: https://github.com/savaseeratesli/PipelineExamples.git
+      uri: https://github.com/savaseeratesli/imagetagger.git
       branch: main
 
   # --- 2. Docker image kaynağı (DockerHub) ---
