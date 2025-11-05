@@ -1,0 +1,53 @@
+resources:
+  # --- 1. Kaynak kod deposu (GitHub) ---
+  - name: app-repo
+    type: git
+    source:
+      uri: https://github.com/savaseeratesli/PipelineExamples.git
+      branch: main
+
+  # --- 2. Docker image kaynağı (DockerHub) ---
+  - name: simple-image
+    type: docker-image
+    source:
+      repository: savaseeratesli/simple-image
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
+
+jobs:
+  - name: build-and-push
+    plan:
+      # 1️⃣ GitHub repo'dan kodu çek
+      - get: app-repo
+        trigger: true
+
+      # 2️⃣ Benzersiz bir tag oluştur
+      - task: create-tag
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: alpine
+              tag: latest
+          inputs:
+            - name: app-repo
+          outputs:
+            - name: version
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                TAG="build-$(date +'%Y%m%d-%H%M%S')"
+                echo $TAG > version/tag.txt
+                echo "Generated image tag: $TAG"
+
+      # 3️⃣ Docker imajını iki tag ile push et:
+      #     - build-20251105-160502
+      #     - latest
+      - put: simple-image
+        params:
+          build: app-repo
+          tag_file: version/tag.txt
+          additional_tags: ["latest"]
