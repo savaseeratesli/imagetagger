@@ -3,14 +3,14 @@ resources:
   - name: app-repo
     type: git
     source:
-      uri: https://github.com/savaseeratesli/PipelineExamples.git
+      uri: https://github.com/savaseeratesli/imagetagger.git
       branch: main
 
   # --- 2. Docker image kaynağı (DockerHub) ---
-  - name: simple-image
+  - name: imagecalismalari
     type: docker-image
     source:
-      repository: savaseeratesli/simple-image
+      repository: savaseeratesli/imagecalismalari
       username: ((dockerhub_username))
       password: ((dockerhub_password))
 
@@ -44,7 +44,7 @@ jobs:
                 echo "Generated image tag: $TAG"
 
       # 3️⃣ Docker imajını hem unique tag hem latest tag ile push et
-      - put: simple-image
+      - put: imagecalismalari
         params:
           build: app-repo
           tag_file: version/tag.txt
