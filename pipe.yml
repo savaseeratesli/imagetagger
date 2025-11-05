@@ -6,7 +6,7 @@ resources:
       uri: https://github.com/savaseeratesli/imagetagger.git
       branch: main
 
-  # --- 2. Docker image kaynağı (DockerHub) ---
+  # --- 2. Docker image kaynağı ---
   - name: imagecalismalari
     type: docker-image
     source:
@@ -17,11 +17,11 @@ resources:
 jobs:
   - name: build-and-push
     plan:
-      # 1️⃣ GitHub repo'dan kodu çek
+      # 1️⃣ GitHub repo'dan kodu al
       - get: app-repo
         trigger: true
 
-      # 2️⃣ Benzersiz bir tag oluştur
+      # 2️⃣ Benzersiz tag oluştur
       - task: create-tag
         config:
           platform: linux
@@ -43,9 +43,15 @@ jobs:
                 echo $TAG > version/tag.txt
                 echo "Generated image tag: $TAG"
 
-      # 3️⃣ Docker imajını hem unique tag hem latest tag ile push et
+      # 3️⃣ Docker imajını unique tag ile push et
       - put: imagecalismalari
         params:
           build: app-repo
           tag_file: version/tag.txt
-          additional_tags: latest
+
+      # 4️⃣ Aynı imajı latest olarak da push et
+      - put: imagecalismalari
+        params:
+          build: app-repo
+          tag: latest
+
