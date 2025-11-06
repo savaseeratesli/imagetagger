@@ -1,26 +1,46 @@
 resources:
-  # --- 1. Kaynak kod deposu (GitHub) ---
+  # 1. GitHub repo
   - name: app-repo
     type: git
     source:
       uri: https://github.com/savaseeratesli/imagetagger.git
       branch: main
 
-  # --- 2. Docker image kaynağı ---
+  # 2. Docker image
   - name: imagetagger
     type: docker-image
     source:
       repository: savaseeratesli/imagetagger
-      tag: latest
       username: ((dockerhub_username))
       password: ((dockerhub_password))
 
 jobs:
-  # --- JOB 1: Docker image build + push ---
   - name: build-and-push
     plan:
+      # --- 1. Repo'yu çek ---
       - get: app-repo
         trigger: true
+
+      # --- 2. Tag oluştur ---
+      - task: generate-tag
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: { repository: alpine }
+          outputs:
+            - name: tag-info
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                TAG=$(date +%Y%m%d-%H%M%S)
+                echo $TAG > tag-info/tag.txt
+                echo "Tag oluşturuldu: $TAG"
+
+      # --- 3. Build ve push işlemi ---
       - put: imagetagger
         params:
-          build: app-repo   # app-repo dizinindeki Dockerfile kullanılacak
+          build: app-repo
+          additional_tags: tag-info/tag.txt
