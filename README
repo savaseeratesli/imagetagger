@@ -1,0 +1,7 @@
+fly -t tutorial set-pipeline -p tagpipeline -c tagpipeline.yml -l vars.yml 
+
+vars.yaml push işleminden dolayı
+# --- Docker Hub bilgileri ---
+dockerhub_username: "savaseeratesli"
+dockerhub_password: "dckr_pat_"
+
