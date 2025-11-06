@@ -1,4 +1,12 @@
+docker run -d -p 9080:9080 --name tag savaseeratesli/imagetagger:latest
+
+fly -t tutorial login -c http://localhost:8080 -u test -p test
+
 fly -t tutorial set-pipeline -p tagpipeline -c tagpipeline.yml -l vars.yml 
+
+fly -t tutorial unpause-pipeline -p tagpipeline
+
+fly -t tutorial trigger-job --job tagpipeline/build-and-push --watch
 
 vars.yaml push işleminden dolayı
 # --- Docker Hub bilgileri ---
